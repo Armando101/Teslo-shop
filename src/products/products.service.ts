@@ -34,7 +34,11 @@ export class ProductsService {
 
   async findAll(paginationDto: PaginationDto) {
     const { limit = 10, offset = 0 } = paginationDto;
-    return await this.productRepository.find({ take: limit, skip: offset });
+    const [result, total] = await this.productRepository.findAndCount({
+      take: limit,
+      skip: offset,
+    });
+    return { data: result, total };
   }
 
   async findOne(term: string) {
@@ -42,7 +46,13 @@ export class ProductsService {
     if (isUUID(term)) {
       product = await this.productRepository.findOneBy({ id: term });
     } else {
-      product = await this.productRepository.findOneBy({ slug: term });
+      const queryBuilder = this.productRepository.createQueryBuilder();
+      product = await queryBuilder
+        .where(`LOWER(title) =LOWER(:title) or slug =LOWER(:slug)`, {
+          title: term,
+          slug: term,
+        })
+        .getOne();
     }
 
     if (!product) {
@@ -51,8 +61,21 @@ export class ProductsService {
     return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    const product = await this.productRepository.preload({
+      id,
+      ...updateProductDto,
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with id: ${id} not found`);
+    }
+
+    try {
+      return await this.productRepository.save(product);
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 
   async remove(id: string) {

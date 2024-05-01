@@ -32,6 +32,10 @@ export class CreateProductDto {
   @IsPositive()
   stock?: number;
 
+  @IsString()
+  @IsOptional()
+  type?: string;
+
   @IsString({ each: true })
   @IsArray()
   sizes: string[];

@@ -30,6 +30,9 @@ export class Product {
   @Column('text', { unique: true })
   slug: string;
 
+  @Column('text', { nullable: true })
+  type: string;
+
   @Column('int', { default: 0 })
   stock: number;
 

@@ -127,6 +127,19 @@ export class ProductsService {
     return response;
   }
 
+  async deleteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');
+
+    try {
+      if (process.env.ENVIRONMENT !== 'dev') {
+        throw new InternalServerErrorException('Not Allowed to do this action');
+      }
+      return await query.delete().where({}).execute();
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
+  }
+
   private handleDBExceptions(error: any) {
     if (error.code === '23505') {
       throw new BadRequestException(error.detail);

@@ -1,7 +1,10 @@
 import {
   BadRequestException,
   Controller,
+  Get,
+  Param,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -10,7 +13,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter } from './helpers/fileFilter.helper';
 import { diskStorage } from 'multer';
 import { VALID_IMAGE_EXTENSIONS } from './helpers/image.constants';
-
+import { fileNamer } from './helpers';
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
@@ -22,6 +25,7 @@ export class FilesController {
       // limits: {fileSize: 1000},
       storage: diskStorage({
         destination: './static/uploads',
+        filename: fileNamer,
       }),
     }),
   )
@@ -32,6 +36,29 @@ export class FilesController {
       );
     }
 
-    return { fileName: file.originalname };
+    const res = await this.filesService.uploadFileAWS(file);
+
+    return res;
   }
+
+  @Get('product')
+  getAllImages() {
+    return this.filesService.getAllFileAWS();
+  }
+
+  @Get('product/:imageName')
+  findProductImage(@Param('imageName') imageName: string) {
+    return this.filesService.getSingleFile(imageName);
+  }
+
+  // @Get('product/:imageName')
+  // findProductImage(
+  //   @Res() res: Response,
+  //   @Param('imageName') imageName: string,
+  // ) {
+  //   const path = this.filesService.getStaticProductImage(imageName);
+
+  //   res.sendFile(path);
+  //   return imageName;
+  // }
 }

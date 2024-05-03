@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
   app.enableCors({
     allowedHeaders: ['content-type'],
     origin: 'http://localhost:4200',
@@ -16,6 +17,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  await app.listen(3000);
+  await app.listen(process.env.PORT);
+  logger.log(`App running on ${process.env.PORT} port`);
 }
 bootstrap();

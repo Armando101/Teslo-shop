@@ -1,6 +1,6 @@
-import { VALID_IMAGE_EXTENSIONS } from './image.constants';
+import { v4 as uuid } from 'uuid';
 
-export const fileFilter = (
+export const fileNamer = (
   req: Express.Request,
   file: Express.Multer.File,
   callback: Function,
@@ -10,10 +10,7 @@ export const fileFilter = (
   }
 
   const fileExtension = file.mimetype.split('/')[1];
+  const fileName = `${uuid()}.${fileExtension}`;
 
-  if (VALID_IMAGE_EXTENSIONS.includes(fileExtension)) {
-    return callback(null, true);
-  }
-
-  callback(null, false);
+  callback(null, fileName);
 };

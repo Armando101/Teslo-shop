@@ -9,6 +9,7 @@ import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter } from './helpers/fileFilter.helper';
 import { diskStorage } from 'multer';
+import { VALID_IMAGE_EXTENSIONS } from './helpers/image.constants';
 
 @Controller('files')
 export class FilesController {
@@ -24,9 +25,11 @@ export class FilesController {
       }),
     }),
   )
-  uploadProductImage(@UploadedFile() file: Express.Multer.File) {
+  async uploadProductImage(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
-      throw new BadRequestException('Make sure the file is an image');
+      throw new BadRequestException(
+        `Make sure the file is an image or has the ${VALID_IMAGE_EXTENSIONS.join(', ')}formats`,
+      );
     }
 
     return { fileName: file.originalname };

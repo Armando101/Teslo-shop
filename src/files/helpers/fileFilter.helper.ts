@@ -1,3 +1,5 @@
+import { VALID_IMAGE_EXTENSIONS } from './image.constants';
+
 export const fileFilter = (
   req: Express.Request,
   file: Express.Multer.File,
@@ -9,9 +11,8 @@ export const fileFilter = (
   }
 
   const fileExtension = file.mimetype.split('/')[1];
-  const validExtensions = ['png'];
 
-  if (validExtensions.includes(fileExtension)) {
+  if (VALID_IMAGE_EXTENSIONS.includes(fileExtension)) {
     return callback(null, true);
   }
 

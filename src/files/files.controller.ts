@@ -37,9 +37,9 @@ export class FilesController {
       );
     }
 
-    const res = await this.filesService.uploadFileAWS(file);
-
-    return res;
+    // const res = await this.filesService.uploadFileAWS(file);
+    // return res;
+    return file;
   }
 
   @Post('product/:folder')

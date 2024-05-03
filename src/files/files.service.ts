@@ -17,7 +17,7 @@ import { join } from 'path';
 export class FilesService {
   clientS3: S3Client;
   constructor(private readonly configService: ConfigService) {
-    this.s3Connection();
+    // this.s3Connection();
   }
 
   getStaticProductImage(imageName: string) {

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -24,7 +25,7 @@ export class FilesController {
       fileFilter,
       // limits: {fileSize: 1000},
       storage: diskStorage({
-        destination: './static/uploads',
+        // destination: './static/uploads',
         filename: fileNamer,
       }),
     }),
@@ -32,13 +33,23 @@ export class FilesController {
   async uploadProductImage(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException(
-        `Make sure the file is an image or has the ${VALID_IMAGE_EXTENSIONS.join(', ')}formats`,
+        `Make sure the file is an image or has the ${VALID_IMAGE_EXTENSIONS.join(', ')} formats`,
       );
     }
 
     const res = await this.filesService.uploadFileAWS(file);
 
     return res;
+  }
+
+  @Post('product/:folder')
+  createFolder(@Param('folder') folder: string) {
+    return this.filesService.createFolder(folder);
+  }
+
+  @Delete('product/:file')
+  deleteFile(@Param('file') file: string) {
+    return this.filesService.deleteObject(file);
   }
 
   @Get('product')

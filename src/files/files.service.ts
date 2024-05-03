@@ -1,7 +1,10 @@
 import {
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   ListObjectsCommand,
   PutObjectCommand,
+  PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -37,15 +40,18 @@ export class FilesService {
   }
 
   async uploadFileAWS(file: Express.Multer.File) {
+    console.log(file);
     const stream = createReadStream(file.path);
-    const uploadParams = {
+    const uploadParams: PutObjectCommandInput = {
       Bucket: this.configService.get('AWS_BUCKET_NAME'),
       Key: file.filename,
       Body: stream,
     };
+
+    const filename = file.filename;
     const command = new PutObjectCommand(uploadParams);
     const result = await this.clientS3.send(command);
-    return result;
+    return { ...result, filename };
   }
 
   async getAllFileAWS() {
@@ -68,5 +74,36 @@ export class FilesService {
       expiresIn: 3600,
     });
     return result;
+  }
+
+  async deleteObject(fileName: string) {
+    const command = new DeleteObjectCommand({
+      Bucket: this.configService.get('AWS_BUCKET_NAME'),
+      Key: fileName,
+    });
+
+    return this.clientS3.send(command);
+  }
+
+  async deleteObjects(fileName: string[]) {
+    const Objects = fileName.map((filename) => ({ Key: filename }));
+    const command = new DeleteObjectsCommand({
+      Bucket: this.configService.get('AWS_BUCKET_NAME'),
+      Delete: {
+        // Array of keys objects to delete,
+        Objects,
+        Quiet: true, // if false returns the keys deleted
+      },
+    });
+
+    return this.clientS3.send(command);
+  }
+
+  async createFolder(Key: string) {
+    const command = new PutObjectCommand({
+      Bucket: this.configService.get('AWS_BUCKET_NAME'),
+      Key: `${Key}/`,
+    });
+    return this.clientS3.send(command);
   }
 }

@@ -1,5 +1,5 @@
 export interface JwtPayload {
-  email: string;
+  id: string;
 
   // You can add more not sensitive data
 }

@@ -12,7 +12,7 @@ import { IncomingHttpHeaders } from 'http';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from './dto';
-import { GetUSer } from './decorators/get-user.decorator';
+import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
 import { GetRawHeaders } from './decorators/get-raw-headers.decorator';
 import { UserRoleGuard } from './guards/user-role/user-role.guard';
@@ -34,11 +34,17 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
+  @Get('check-status')
+  @Auth()
+  checkAuthStatus(@GetUser() user: User) {
+    return this.authService.checkAuthStatus(user);
+  }
+
   @Get('private')
   @UseGuards(AuthGuard())
   testingPrivateRoute(
-    @GetUSer() user: User,
-    @GetUSer('email') userEmail: User,
+    @GetUser() user: User,
+    @GetUser('email') userEmail: User,
     @GetRawHeaders() rawHeaders: string[],
     @Headers() headers: IncomingHttpHeaders,
   ) {
@@ -56,7 +62,7 @@ export class AuthController {
   @Get('private2')
   @UseGuards(AuthGuard(), UserRoleGuard)
   @RoleProtected(ValidRoles.admin, ValidRoles.superUser)
-  testingPrivateRoute2(@GetUSer() user: User) {
+  testingPrivateRoute2(@GetUser() user: User) {
     return {
       ok: true,
       message: 'Hello world private',
@@ -66,7 +72,7 @@ export class AuthController {
 
   @Get('private3')
   @Auth(ValidRoles.superUser, ValidRoles.admin)
-  testingPrivateRoute3(@GetUSer() user: User) {
+  testingPrivateRoute3(@GetUser() user: User) {
     return {
       ok: true,
       message: 'Hello world private',

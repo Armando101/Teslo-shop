@@ -1,6 +1,16 @@
+import { ValidRoles } from 'src/auth/interfaces/valid-roles';
 import { SeedData } from './interfaces';
+import * as bcrypt from 'bcrypt';
 
 export const initialData: SeedData = {
+  users: [
+    {
+      email: 'test1@google.com',
+      fullName: 'Test one',
+      password: bcrypt.hashSync('Abc123', 10),
+      role: [ValidRoles.admin],
+    },
+  ],
   products: [
     {
       description:

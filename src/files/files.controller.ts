@@ -15,6 +15,9 @@ import { fileFilter } from './helpers/fileFilter.helper';
 import { diskStorage } from 'multer';
 import { VALID_IMAGE_EXTENSIONS } from './helpers/image.constants';
 import { fileNamer } from './helpers';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Files')
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
